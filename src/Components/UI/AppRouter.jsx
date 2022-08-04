@@ -1,22 +1,16 @@
 import React from 'react';
-import {Navigate, Route, Routes} from "react-router-dom";
-import Home from "../pages/Home";
-import About from "../pages/About";
-import Posts from "../pages/Posts";
-import PostIdPage from "../pages/PostIdPage";
-import Error from "../hooks/Error";
+import {Route, Routes} from "react-router-dom";
+import {privateRoutes, publicRoutes} from "../../router/router";
 
 const AppRouter = () => {
   return (
     <Routes>
-      <Route
-        path="/"
-        element={<Navigate to="/posts"/>}/>
-      <Route path="/home" element={<Home />} />
-      <Route path="/about" element={<About />} />
-      <Route path="/posts" element={<Posts />} />
-      <Route path="/posts/:id" element={<PostIdPage />} />
-      <Route path="*" element={<Error/>}/>
+      {privateRoutes.map(route =>
+        <Route key={Date.now()} path={route.path} element={route.element}/>
+      )}
+      {publicRoutes.map(route =>
+        <Route key={Date.now()} path={route.path} element={route.element}/>
+      )}
     </Routes>
   );
 };
