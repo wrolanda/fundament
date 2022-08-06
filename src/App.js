@@ -1,6 +1,6 @@
 import Navbar from './Components/UI/Navbar/Navbar';
 import './styles/App.css'
-import AppRouter from "./Components/UI/AppRouter";
+import AppRouter from "./Components/AppRouter";
 import {AuthContext} from "./context/context";
 import {useEffect, useState} from "react";
 
@@ -21,10 +21,8 @@ const App = () => {
       setIsAuth,
       isLoading,
     }}>
-      <div className='App'>
-        <Navbar/>
-        <AppRouter/>
-      </div>
+      <Navbar/>
+      <AppRouter/>
     </AuthContext.Provider>
   )
 }

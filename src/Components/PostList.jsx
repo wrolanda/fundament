@@ -13,7 +13,7 @@ const PostList = ({posts, title, remove}) => {
     <div>
       <h1>{title}</h1>
       <TransitionGroup>
-        {posts.map((post, index) =>
+        {posts.map((post) =>
           <CSSTransition
             key={post.id}
             timeout={500}
@@ -23,7 +23,6 @@ const PostList = ({posts, title, remove}) => {
           </CSSTransition>
         )}
       </TransitionGroup>
-
     </div>
   );
 };

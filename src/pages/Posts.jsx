@@ -1,17 +1,19 @@
-import React, {useEffect, useState} from 'react'
-import PostList from "../PostList";
-import PostForm from "../PostForm";
+import React, {useEffect, useRef, useState} from 'react'
+import PostList from "../Components/PostList";
+import PostForm from "../Components/PostForm";
 import * as PropTypes from "prop-types";
-import MyInput from "../UI/input/MyInput";
-import PostFilter from "../PostFilter";
-import MyModal from "../UI/MyModal/MyModal";
-import MyButton from "../UI/button/MyButton";
+import MyInput from "../Components/UI/input/MyInput";
+import PostFilter from "../Components/PostFilter";
+import MyModal from "../Components/UI/MyModal/MyModal";
+import MyButton from "../Components/UI/button/MyButton";
 import {usePosts} from "../hooks/usePosts";
 import PostService from "../API/PostService";
-import Loader from "../UI/Loader/Loader";
+import Loader from "../Components/UI/Loader/Loader";
 import {useFetching} from "../hooks/useFetching";
 import {getPageCount} from "../utils/pages";
-import Pagination from "../UI/pagination/Pagination";
+import Pagination from "../Components/UI/pagination/Pagination";
+import {useObserver} from "../hooks/useObserver";
+import MySelect from "../Components/UI/Select/MySelect";
 
 MyInput.propTypes = {placeholder: PropTypes.string};
 
@@ -23,17 +25,22 @@ function Posts() {
   const [limit, setLimit] = useState(10);
   const [page, setPage] = useState(1);
   const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query);
+  const lastElement = useRef();
 
-  const [fetchPosts, isPostsLoading, postsError] = useFetching(async () => {
+  const [fetchPosts, isPostsLoading, postsError] = useFetching(async (limit, page) => {
     const response = await PostService.getAll(limit, page);
-    setPosts(response.data);
+    setPosts([...posts, ...response.data]);
     const totalCount = response.headers['x-total-count'];
     setTotalPages(getPageCount(totalCount, limit));
   })
 
+  useObserver(lastElement, page < totalPages, isPostsLoading, () => {
+    setPage(page + 1);
+  })
+
   useEffect(() => {
-    fetchPosts()
-  }, [page]);
+    fetchPosts(limit, page)
+  }, [page, limit]);
 
   const createPost = (newPost) => {
     setPosts([...posts, newPost]);
@@ -59,14 +66,28 @@ function Posts() {
       <hr/>
       <PostFilter filter={filter}
                   setFilter={setFilter}/>
+      <MySelect value={limit}
+                onChange={value => setLimit(value)}
+                defaultValue="number of items per page"
+                option={[
+                  {value: 5, name: '5'},
+                  {value: 10, name: '10'},
+                  {value: 25, name: '25'},
+                  {value: -1, name: 'show all'},
+                ]}
+      />
       {postsError &&
         <h1>Error {postsError}</h1>
       }
-      {isPostsLoading
-        ? <div style={{display: 'flex', justifyContent: 'center', marginTop: 50}}><Loader/></div>
-        : <PostList posts={sortedAndSearchedPosts}
-                    remove={removePost}
-                    title="Posts about JS"/>
+      <PostList posts={sortedAndSearchedPosts}
+                remove={removePost}
+                title="Posts about JS"/>
+      <div ref={lastElement} style={{height: 20}}/>
+      {isPostsLoading &&
+        <div
+          style={{display: 'flex', justifyContent: 'center', marginTop: 50}}>
+          <Loader/>
+        </div>
       }
       <Pagination page={page} changePage={changePage} totalPages={totalPages}/>
     </div>

@@ -1,8 +1,8 @@
 import React, {useContext} from 'react';
 import {Route, Routes} from "react-router-dom";
-import {privateRoutes, publicRoutes} from "../../router/router";
-import {AuthContext} from "../../context/context";
-import Loader from "./Loader/Loader";
+import {privateRoutes, publicRoutes} from "../router/router";
+import {AuthContext} from "../context/context";
+import Loader from "./UI/Loader/Loader";
 
 const AppRouter = () => {
   const {isAuth, isLoading} = useContext(AuthContext)
